@@ -1,115 +1,75 @@
-<!-- Dev de Corazon 
-     El codigo de la galaxia de flores amarillas
-     -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Feliz Día de las Flores Amarillas | Galaxia 3D</title>
+    <title>Galaxia de Flores Amarillas</title>
     <style>
         body {
             margin: 0;
             overflow: hidden;
-            font-family: 'Poppins', 'Segoe UI', 'Quicksand', 'Fredoka One', cursive, sans-serif;
+            font-family: 'Poppins', 'Segoe UI', sans-serif;
             color: #fff;
+            background-color: #020210;
         }
         canvas {
             display: block;
         }
-
-        /* Mensaje central: Feliz día */
-        .greeting {
-            position: absolute;
-            top: 30px;
+        /* Pantalla de inicio con el corazón interactivo */
+        #welcome-screen {
+            position: fixed;
+            top: 0;
             left: 0;
-            right: 0;
-            text-align: center;
-            pointer-events: none;
-            z-index: 20;
-            font-size: 2.5rem;
-            font-weight: 800;
-            text-shadow: 0 0 20px rgba(0,0,0,0.5), 0 0 5px #ffaa33;
-            background: linear-gradient(135deg, #FFE55C, #FFB347);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            letter-spacing: -0.5px;
-            animation: fadeInDown 1s ease-out;
+            width: 100vw;
+            height: 100vh;
+            background: #020210;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            transition: opacity 1s ease;
+            cursor: pointer;
         }
-        .greeting small {
-            font-size: 1.1rem;
-            display: block;
-            color: #FFDE7A;
+        .heart-btn {
+            font-size: 5rem;
             background: none;
-            -webkit-background-clip: unset;
-            background-clip: unset;
-            text-shadow: 0 0 8px rgba(0,0,0,0.6);
-            margin-top: 5px;
-            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            animation: pulse 1.2s infinite alternate;
+            filter: drop-shadow(0 0 20px rgba(255, 217, 102, 0.6));
         }
-        @keyframes fadeInDown {
-            from {
-                opacity: 0;
-                transform: translateY(-30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Controles y badge */
-        .badge-control {
-            position: absolute;
-            bottom: 20px;
-            left: 20px;
-            background: rgba(0,0,0,0.5);
-            backdrop-filter: blur(5px);
-            border-radius: 40px;
-            padding: 6px 16px;
-            font-size: 0.7rem;
-            pointer-events: none;
-            font-weight: 500;
-            color: #FFD966;
-            border: 1px solid #FFD96680;
-            z-index: 15;
-        }
-        .control-hint {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0,0,0,0.5);
-            backdrop-filter: blur(4px);
-            padding: 5px 12px;
-            border-radius: 30px;
-            font-size: 0.7rem;
-            pointer-events: none;
-            white-space: nowrap;
-            font-family: monospace;
-            letter-spacing: 1px;
+        .welcome-text {
+            margin-top: 20px;
+            font-size: 1.1rem;
             color: #FFE0A3;
-            z-index: 15;
+            letter-spacing: 1px;
+            font-weight: 500;
+            text-shadow: 0 0 10px rgba(255, 217, 102, 0.4);
         }
-        @media (max-width: 700px) {
-            .greeting { font-size: 1.6rem; top: 20px; }
-            .greeting small { font-size: 0.8rem; }
-            .badge-control { font-size: 0.6rem; }
-            .control-hint { font-size: 0.6rem; white-space: nowrap; }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.18); }
+        }
+        /* Contenedor oculto para el reproductor de YouTube */
+        #youtube-container {
+            display: none;
         }
     </style>
 </head>
 <body>
 
-    <!-- Mensaje -->
-    <div class="greeting">
-        🌻 Feliz día de las Flores Amarillas 🌻
-        <small>✨ Un ramo de estrellas para ti ✨</small>
+    <!-- Pantalla de Bienvenida con el Corazón Amarillo -->
+    <div id="welcome-screen">
+        <button class="heart-btn" id="startBtn">💛</button>
+        <div class="welcome-text">Toca el corazón para entrar</div>
     </div>
 
-    <div class="badge-control">🌀 360° | Galaxia de Girasoles</div>
-    <div class="control-hint">🖱️ Arrastra para rotar 360° | Zoom con scroll</div>
+    <!-- Espacio oculto para el reproductor de YouTube -->
+    <div id="youtube-container">
+        <!-- Reemplaza el enlace de abajo por tu link de YouTube (ej. https://www.youtube.com/embed/TU_ID_DE_VIDEO?autoplay=1&loop=1) -->
+        <iframe id="ytAudio" width="0" height="0" src="" title="audio" allow="autoplay"></iframe>
+    </div>
 
     <script type="importmap">
         {
@@ -127,7 +87,19 @@
         import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
         import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 
-        // --- Escena ---
+        // Evento para iniciar música y abrir galaxia al tocar el corazón
+        document.getElementById('startBtn').addEventListener('click', () => {
+            const iframe = document.getElementById('ytAudio');
+            // 👇 PEGA TU LINK DE YOUTUBE EN FORMATO EMBED AQUÍ ABAJO 👇
+            iframe.src = "https://www.youtube.com/embed/mzTew3e0Ygk?autoplay=1&loop=1&playlist=mzTew3e0Ygk";
+
+            const welcomeScreen = document.getElementById('welcome-screen');
+            welcomeScreen.style.opacity = '0';
+            setTimeout(() => {
+                welcomeScreen.style.display = 'none';
+            }, 1000);
+        });
+
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0x020210);
         scene.fog = new THREE.FogExp2(0x020210, 0.00045);
@@ -143,7 +115,6 @@
         renderer.toneMappingExposure = 1.3;
         document.body.appendChild(renderer.domElement);
 
-        // --- Postprocesado bloom ---
         const renderScene = new RenderPass(scene, camera);
         const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.2, 0.4, 0.85);
         bloomPass.threshold = 0.08;
@@ -153,7 +124,6 @@
         effectComposer.addPass(renderScene);
         effectComposer.addPass(bloomPass);
 
-        // --- Controles 360° ---
         const controls = new OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
         controls.dampingFactor = 0.06;
@@ -165,8 +135,6 @@
         controls.autoRotateSpeed = 0.65;
         controls.target.set(0, 0.5, 0);
 
-        // ---------- 1. FLORES EN FORMA DE GALAXIA ----------
-        // Texturas variadas de flores amarillas 
         function createFlowerTexture(type) {
             const canvas = document.createElement('canvas');
             canvas.width = 128;
@@ -199,7 +167,7 @@
                     ctx.fill();
                     ctx.restore();
                 }
-            } else { // pequeña estrella
+            } else { 
                 for (let i = 0; i < 12; i++) {
                     const angle = (i / 12) * Math.PI * 2;
                     const px = cx + Math.cos(angle) * 28;
@@ -210,7 +178,6 @@
                     ctx.fill();
                 }
             }
-            // centro común
             ctx.beginPath();
             ctx.arc(cx, cy, 16, 0, 2 * Math.PI);
             ctx.fillStyle = '#FF8C42';
@@ -220,13 +187,13 @@
             ctx.fillStyle = '#D2691E';
             ctx.fill();
             ctx.fillStyle = '#FFF2B5';
-            for (let i=0; i<20; i++) {
+            for (let i = 0; i < 20; i++) {
                 const rad = Math.random() * 12;
                 const ang = Math.random() * Math.PI * 2;
                 const x = cx + Math.cos(ang) * rad;
                 const y = cy + Math.sin(ang) * rad;
                 ctx.beginPath();
-                ctx.arc(x, y, 1.2, 0, 2*Math.PI);
+                ctx.arc(x, y, 1.2, 0, 2 * Math.PI);
                 ctx.fill();
             }
             const texture = new THREE.CanvasTexture(canvas);
@@ -273,17 +240,17 @@
             const x = Math.cos(angle) * radius;
             const z = Math.sin(angle) * radius;
             const y = yOffset * 1.3;
-            positions[i*3] = x;
-            positions[i*3+1] = y;
-            positions[i*3+2] = z;
+            positions[i * 3] = x;
+            positions[i * 3 + 1] = y;
+            positions[i * 3 + 2] = z;
             
-            const distFactor = Math.min(1, Math.sqrt(x*x + y*y + z*z) / 14);
+            const distFactor = Math.min(1, Math.sqrt(x * x + y * y + z * z) / 14);
             let r = 1.0, g = 0.7 + Math.random() * 0.3, b = 0.1 + Math.random() * 0.3;
-            if (distFactor < 0.3) { g = 0.55 + Math.random()*0.2; b = 0.08; }
+            if (distFactor < 0.3) { g = 0.55 + Math.random() * 0.2; b = 0.08; }
             if (distFactor > 0.7) { g = 0.92; b = 0.45; }
-            colors[i*3] = r;
-            colors[i*3+1] = g;
-            colors[i*3+2] = b;
+            colors[i * 3] = r;
+            colors[i * 3 + 1] = g;
+            colors[i * 3 + 2] = b;
             
             let sizeVal = 0.28 + Math.random() * 0.48;
             if (distFactor < 0.3) sizeVal *= 0.85;
@@ -344,19 +311,15 @@
         const flowerPoints = new THREE.Points(flowerGeometry, flowerMaterial);
         scene.add(flowerPoints);
 
-        // ---------- 2. RAMOS DE GIRASOLES (SUNFLOWERS) EN 3D ----------
-        // Función para crear un girasol individual (tallo, hojas, flor con pétalos)
         function createSunflower(x, z, yOffset = 0, scaleFactor = 1.0) {
             const group = new THREE.Group();
             
-            // Tallo 
             const stemGeo = new THREE.CylinderGeometry(0.12 * scaleFactor, 0.18 * scaleFactor, 1.1 * scaleFactor, 6);
             const stemMat = new THREE.MeshStandardMaterial({ color: 0x5a9e4e, roughness: 0.6, metalness: 0.1 });
             const stem = new THREE.Mesh(stemGeo, stemMat);
             stem.position.y = -0.55 * scaleFactor;
             group.add(stem);
             
-            // Hojas 
             const leafMat = new THREE.MeshStandardMaterial({ color: 0x6ab04c });
             const leaf1Geo = new THREE.BoxGeometry(0.35 * scaleFactor, 0.08 * scaleFactor, 0.2 * scaleFactor);
             const leaf1 = new THREE.Mesh(leaf1Geo, leafMat);
@@ -369,14 +332,12 @@
             leaf2.rotation.z = -0.5;
             group.add(leaf2);
             
-            // Centro de la flor 
             const centerGeo = new THREE.SphereGeometry(0.28 * scaleFactor, 16, 16);
             const centerMat = new THREE.MeshStandardMaterial({ color: 0xb5651d, emissive: 0x7a3e0a, emissiveIntensity: 0.25 });
             const center = new THREE.Mesh(centerGeo, centerMat);
             center.position.y = 0.1 * scaleFactor;
             group.add(center);
             
-            // Pétalos amarillos alrededor (12 pétalos planos)
             const petalMat = new THREE.MeshStandardMaterial({ color: 0xffcc44, emissive: 0xffaa33, emissiveIntensity: 0.2 });
             for (let i = 0; i < 14; i++) {
                 const angle = (i / 14) * Math.PI * 2;
@@ -389,7 +350,6 @@
                 petal.rotation.x = 0.4;
                 group.add(petal);
             }
-            // Segunda capa de pétalos más pequeños
             for (let i = 0; i < 10; i++) {
                 const angle = (i / 10) * Math.PI * 2 + 0.3;
                 const petalGeo = new THREE.CylinderGeometry(0.16 * scaleFactor, 0.18 * scaleFactor, 0.5 * scaleFactor, 5);
@@ -403,13 +363,11 @@
             }
             
             group.position.set(x, yOffset, z);
-            // Rotación aleatoria para que no todos miren igual
             group.rotation.y = Math.random() * Math.PI * 2;
             return group;
         }
         
         const sunflowerPositions = [];
-        // Núcleo: algunos alrededor
         for (let i = 0; i < 8; i++) {
             const angle = (i / 8) * Math.PI * 2;
             const radius = 1.8 + Math.random() * 1.2;
@@ -417,8 +375,7 @@
             const z = Math.sin(angle) * radius;
             sunflowerPositions.push({ x, z, y: -0.2 + Math.random() * 0.5, scale: 0.9 + Math.random() * 0.3 });
         }
-        // Brazos espirales
-        const armAngles = [0, Math.PI/2, Math.PI, 3*Math.PI/2];
+        const armAngles = [0, Math.PI / 2, Math.PI, 3 * Math.PI / 2];
         for (let a = 0; a < armAngles.length; a++) {
             for (let r = 3.5; r <= 12; r += 2.2) {
                 const angleOffset = armAngles[a];
@@ -430,7 +387,6 @@
                 sunflowerPositions.push({ x, z, y: y - 0.1, scale: 0.8 + Math.random() * 0.5 });
             }
         }
-        // Ramos adicionales flotantes
         for (let i = 0; i < 12; i++) {
             const rad = 6 + Math.random() * 7;
             const ang = Math.random() * Math.PI * 2;
@@ -447,26 +403,44 @@
         });
         scene.add(sunflowersGroup);
         
-        // Añadir algunas partículas de polen alrededor de los girasoles (efecto brillo)
-        const pollenCount = 1800;
-        const pollenPositions = new Float32Array(pollenCount * 3);
-        for (let i = 0; i < pollenCount; i++) {
-            const idx = Math.floor(Math.random() * sunflowerPositions.length);
-            const base = sunflowerPositions[idx];
-            const offsetX = (Math.random() - 0.5) * 1.2;
-            const offsetZ = (Math.random() - 0.5) * 1.2;
-            const offsetY = (Math.random() - 0.5) * 1.0;
-            pollenPositions[i*3] = base.x + offsetX;
-            pollenPositions[i*3+1] = base.y + offsetY + 0.2;
-            pollenPositions[i*3+2] = base.z + offsetZ;
+        const starCount = 3000;
+        const starGeo = new THREE.BufferGeometry();
+        const starPos = new Float32Array(starCount * 3);
+        for (let i = 0; i < starCount * 3; i += 3) {
+            starPos[i] = (Math.random() - 0.5) * 400;
+            starPos[i + 1] = (Math.random() - 0.5) * 400;
+            starPos[i + 2] = (Math.random() - 0.5) * 400;
         }
-        const pollenGeo = new THREE.BufferGeometry();
-        pollenGeo.setAttribute('position', new THREE.BufferAttribute(pollenPositions, 3));
-        const pollenMat = new THREE.PointsMaterial({ color: 0xffdd88, size: 0.05, transparent: true, blending: THREE.AdditiveBlending });
-        const pollenPoints = new THREE.Points(pollenGeo, pollenMat);
-        scene.add(pollenPoints);
-        
-        // ---------- 3. ELEMENTOS DE FONDO: ESTRELLAS Y POLVO ----------
-        const starCount = 4500;
-        const starPositionsArr = new Float32Array(starCount * 3);
-        const starC
+        starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+        const starMat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.6, transparent: true, opacity: 0.8 });
+        const stars = new THREE.Points(starGeo, starMat);
+        scene.add(stars);
+
+        const ambientLight = new THREE.AmbientLight(0xfffaed, 1.2);
+        scene.add(ambientLight);
+        const pointLight = new THREE.PointLight(0xffd700, 2.5, 50);
+        pointLight.position.set(0, 2, 0);
+        scene.add(pointLight);
+
+        const clock = new THREE.Clock();
+        function animate() {
+            requestAnimationFrame(animate);
+            const elapsedTime = clock.getElapsedTime();
+            
+            flowerPoints.rotation.y = elapsedTime * 0.05;
+            sunflowersGroup.rotation.y = elapsedTime * 0.05;
+            
+            controls.update();
+            effectComposer.render();
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            effectComposer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>
